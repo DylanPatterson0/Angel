@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-interface TokenTemplate is IERC20 {
+interface ITokenTemplate is IERC20 {
     /**
      * @dev Bids on an auction using external funds, emits event Bid
      * Must check if auction exists && auction hasn't ended && bid isn't too low
@@ -17,4 +17,15 @@ interface TokenTemplate is IERC20 {
     function transfer() external;
 
     function transferFrom() external;
+}
+
+contract TokenTemplate is ITokenTemplate {
+
+    function setControllerContract(address _controllerContract) external {}
+
+    function getControllerContract() external {}
+
+    function transfer() external {}
+
+    function transferFrom() external {}
 }
