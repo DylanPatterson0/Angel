@@ -18,16 +18,20 @@ interface IControllerTemplate {
 
 }
 
-contract TokenControllerFactory is IControllerTemplate {
+contract ControllerTemplate is IControllerTemplate {
 
     TokenTemplate internal _tokenContract;
+
+    address[] internal _approvalForSetTokenContract;
+
+    // add approval modifier for setTokenContract
 
     function setTokenContract(address tokenContract) external override {
         _tokenContract = TokenTemplate(tokenContract);
     }
 
     function invest(uint256 _amount, address _company) external {
-
+        // call transfer or transferFrom 
     }
 
     function sellTokens(uint256 _amount, address _company) external {

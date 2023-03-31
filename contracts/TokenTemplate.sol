@@ -19,7 +19,9 @@ interface ITokenTemplate is IERC20 {
     function transferFrom() external;
 }
 
-contract TokenTemplate is ITokenTemplate {
+contract TokenTemplate is ERC20 {
+
+    constructor(string memory _name, string memory _symbol, uint256 _maxSupply) ERC20(_name, _symbol) {}
 
     function setControllerContract(address _controllerContract) external {}
 
