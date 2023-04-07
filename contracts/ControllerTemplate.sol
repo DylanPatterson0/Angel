@@ -24,6 +24,8 @@ contract ControllerTemplate is IControllerTemplate {
 
     address[] internal _approvalForSetTokenContract;
 
+    constructor (address _owner) {}
+
     // add approval modifier for setTokenContract
 
     function setTokenContract(address tokenContract) external override {

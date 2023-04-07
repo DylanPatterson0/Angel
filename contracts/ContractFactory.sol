@@ -32,11 +32,15 @@ contract ContractFactory is IContractFactory {
     
 
     function createToken(string memory _name, string memory _symbol, uint256 _maxSupply) external override{
-        // token = new Token(_name, _symbol, _maxSupply)
+        _token = new TokenTemplate(_name, _symbol, _maxSupply);
+
+        _tokenList.push(_token);
     }
 
     function createController(address _owner) external {
+        _controller = new ControllerTemplate(_owner);
 
+        _controllerList.push(_controller);
     }
 
 }

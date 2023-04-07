@@ -4,30 +4,53 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-
-interface ITokenTemplate is IERC20 {
-    /**
-     * @dev Bids on an auction using external funds, emits event Bid
-     * Must check if auction exists && auction hasn't ended && bid isn't too low
-     */
-    function setControllerContract(address _controllerContract) external;
-
-    function getControllerContract() external;
-
-    function transfer() external;
-
-    function transferFrom() external;
-}
+import "./ControllerTemplate.sol";
 
 contract TokenTemplate is ERC20 {
 
-    constructor(string memory _name, string memory _symbol, uint256 _maxSupply) ERC20(_name, _symbol) {}
+    ControllerTemplate internal _controller;
 
-    function setControllerContract(address _controllerContract) external {}
+    // account -> amount minted -> timestamp of minting
+    mapping (address => mapping (uint256 => uint256)) internal _mintingTimestamps;
+    mapping (address => uint256[]) internal _mints;
 
-    function getControllerContract() external {}
 
-    function transfer() external {}
+    mapping(address => uint256[]) internal _mintTimestamps;
+    mapping(address => uint256[]) internal _mintAmounts;
+    mapping(address => uint256) internal _mintIndex;
 
-    function transferFrom() external {}
+    mapping(address => uint256) internal _availbleToTrade;
+
+    constructor(string memory _name, string memory _symbol, uint256 _maxSupply) ERC20(_name, _symbol) {
+
+    }
+
+    function setControllerContract(address _controllerAddress) external {
+        _controller = ControllerTemplate(_controllerAddress);
+    }
+
+    function getControllerContract() external {
+        // return address(_controller); 
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal override {
+
+        uint256 index = _mintIndex[from];
+        uint256 timeStampMinted = _mintTimestamps[from][index];
+        uint256 amountMinted = _mintAmounts[from][index];
+
+        if (now - timeStampMinted)
+        // uint256 availableToTrade = 
+    }
+
+    function mint(address account) public payable {
+        _mintingTimestamps[account][now] = msg.value;
+        _mints[account].push(msg.value);
+        _mint(account, msg.value);
+    }
+
 }
