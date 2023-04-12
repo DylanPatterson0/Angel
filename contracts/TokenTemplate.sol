@@ -39,23 +39,27 @@ contract TokenTemplate is ERC20 {
         _mint(account, msg.value);
     }
 
+
+
     function getAvailableToTrade(
         address account
-    ) public view returns (uint256) {}
+    ) public returns (uint256) {
+        if (block.timestamp - _mintTimestamps[account][_mintIndex[account]] > 24 weeks) {
+            _availbleToTrade[account] += _mintAmounts[account][_mintIndex[account]];
+        }
+
+        return _availbleToTrade[account];
+    }
+    
 
     function _beforeTokenTransfer(
         address from,
         address,
         uint256 amount
     ) internal override {
-        uint256 index = _mintIndex[from];
-        uint256 timeStampMinted = _mintTimestamps[from][index];
-        uint256 amountMinted = _mintAmounts[from][index];
 
         // update amount available to trade based on time since mint
-        if (block.timestamp - timeStampMinted > 24 weeks) {
-            _availbleToTrade[from] += amountMinted;
-        }
+        getAvailableToTrade(from);
 
         // require that amount is less than or equal to tokens available for trade
         require(amount <= _availbleToTrade[from], "Tokens locked up");

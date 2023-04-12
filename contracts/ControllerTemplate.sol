@@ -12,7 +12,7 @@ interface IControllerTemplate {
 
     function setTokenContract(address tokenContract) external;
 
-    function invest(uint256 _amount, address _company) external;
+    function invest(address investor, uint256 _amount, address _company) external;
 
     function sellTokens(uint256 _amount, address _company) external;
 
@@ -34,6 +34,8 @@ contract ControllerTemplate is IControllerTemplate {
 
     function invest(uint256 _amount, address _company) external {
         // call transfer or transferFrom 
+        _tokenContract.transferFrom(address(this), msg.sender, _amount);
+        emit Invested(_amount, msg.sender, _company);
     }
 
     function sellTokens(uint256 _amount, address _company) external {
