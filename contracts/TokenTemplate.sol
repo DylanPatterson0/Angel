@@ -31,8 +31,8 @@ contract TokenTemplate is ERC20 {
         _controller = ControllerTemplate(_controllerAddress);
     }
 
-    function getControllerContract() external {
-        // return address(_controller);
+    function getControllerContract() external view returns (address) {
+        return address(_controller);
     }
 
     function mint(address account) public payable {
