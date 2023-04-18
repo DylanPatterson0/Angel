@@ -19,6 +19,8 @@ contract TokenTemplate is ERC20 {
 
     mapping(address => uint256) internal _availbleToTrade;
 
+    event Minted(address account, uint256 amount, address token);
+
     constructor(
         string memory _name,
         string memory _symbol,
@@ -37,9 +39,14 @@ contract TokenTemplate is ERC20 {
         _mintingTimestamps[account][block.timestamp] = msg.value;
         _mints[account].push(msg.value);
         _mint(account, msg.value);
+
+        emit Minted(account, msg.value, address(this));
     }
 
 
+    // the functionality that stores how many tokens are available for trade should be dealth with off-chain
+    // should emit event showing when it was minted and then should also keep track in storage
+    // we should update the anmount available to spend via frontend
 
     function getAvailableToTrade(
         address account
