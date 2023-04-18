@@ -17,7 +17,7 @@ contract TokenTemplate is ERC20 {
     mapping(address => uint256[]) internal _mintAmounts;
     mapping(address => uint256) internal _mintIndex;
 
-    mapping(address => uint256) internal _availbleToTrade;
+    mapping(address => uint256) internal _availableToTrade;
 
     constructor(
         string memory _name,
@@ -54,14 +54,14 @@ contract TokenTemplate is ERC20 {
 
         // update amount available to trade based on time since mint
         if (block.timestamp - timeStampMinted > 24 weeks) {
-            _availbleToTrade[from] += amountMinted;
+            _availableToTrade[from] += amountMinted;
         }
 
         // require that amount is less than or equal to tokens available for trade
         require(amount <= _availbleToTrade[from], "Tokens locked up");
         
         // update amount availble to trade based on tokens spent
-        _availbleToTrade[from] -= amount;
+        _availableToTrade[from] -= amount;
     }
 
     
