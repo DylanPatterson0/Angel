@@ -19,6 +19,8 @@ contract TokenTemplate is ERC20 {
 
     mapping(address => uint256) internal _availableToTrade;
 
+    event Minted(address account, uint256 amount, address token);
+
     constructor(
         string memory _name,
         string memory _symbol,
@@ -33,10 +35,12 @@ contract TokenTemplate is ERC20 {
         return address(_controller);
     }
 
-    function mint(address account) public payable {
-        _mintingTimestamps[account][block.timestamp] = msg.value;
-        _mints[account].push(msg.value);
-        _mint(account, msg.value);
+    function mint(address account, uint256 amount) public payable {
+        _mintingTimestamps[account][block.timestamp] = amount;
+        _mints[account].push(amount);
+        _mint(account, amount);
+
+        emit Minted(account, amount, address(this));
     }
 
     function getAvailableToTrade(
