@@ -58,11 +58,9 @@ contract TokenTemplate is ERC20 {
         }
 
         // require that amount is less than or equal to tokens available for trade
-        require(amount <= _availbleToTrade[from], "Tokens locked up");
-        
+        require(amount <= _availableToTrade[from], "Tokens locked up");
+
         // update amount availble to trade based on tokens spent
         _availableToTrade[from] -= amount;
     }
-
-    
 }

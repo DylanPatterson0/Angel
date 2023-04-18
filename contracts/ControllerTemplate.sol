@@ -8,23 +8,26 @@ import "./TokenTemplate.sol";
 
 interface IControllerTemplate {
     event Invested(uint256 _amount, address _investor, address _company);
-    event Sold(uint256 amount, address _company, address _buyer, address _seller);
+    event Sold(
+        uint256 amount,
+        address _company,
+        address _buyer,
+        address _seller
+    );
 
     function setTokenContract(address tokenContract) external;
 
     function invest(uint256 _amount, address _company) external;
 
     function sellTokens(uint256 _amount, address _company) external;
-
 }
 
 contract ControllerTemplate is IControllerTemplate {
-
     TokenTemplate internal _tokenContract;
 
     address[] internal _approvalForSetTokenContract;
 
-    constructor (address _owner) {}
+    constructor(address _owner) {}
 
     // add approval modifier for setTokenContract
 
@@ -32,13 +35,11 @@ contract ControllerTemplate is IControllerTemplate {
         _tokenContract = TokenTemplate(tokenContract);
     }
 
-    function invest(uint256 _amount, address _company) external {
-        // call transfer or transferFrom 
+    function invest(uint256 _amount, address _company) external override {
+        // call transfer or transferFrom
         _tokenContract.transferFrom(address(this), msg.sender, _amount);
         emit Invested(_amount, msg.sender, _company);
     }
 
-    function sellTokens(uint256 _amount, address _company) external {
-
-    }
+    function sellTokens(uint256 _amount, address _company) external override {}
 }
