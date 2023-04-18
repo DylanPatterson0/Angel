@@ -17,9 +17,7 @@ contract TokenTemplate is ERC20 {
     mapping(address => uint256[]) internal _mintAmounts;
     mapping(address => uint256) internal _mintIndex;
 
-    mapping(address => uint256) internal _availbleToTrade;
-
-    event Minted(address account, uint256 amount, address token);
+    mapping(address => uint256) internal _availableToTrade;
 
     constructor(
         string memory _name,
@@ -39,40 +37,31 @@ contract TokenTemplate is ERC20 {
         _mintingTimestamps[account][block.timestamp] = msg.value;
         _mints[account].push(msg.value);
         _mint(account, msg.value);
-
-        emit Minted(account, msg.value, address(this));
     }
-
-
-    // the functionality that stores how many tokens are available for trade should be dealth with off-chain
-    // should emit event showing when it was minted and then should also keep track in storage
-    // we should update the anmount available to spend via frontend
 
     function getAvailableToTrade(
         address account
-    ) public returns (uint256) {
-        if (block.timestamp - _mintTimestamps[account][_mintIndex[account]] > 24 weeks) {
-            _availbleToTrade[account] += _mintAmounts[account][_mintIndex[account]];
-        }
-
-        return _availbleToTrade[account];
-    }
-    
+    ) public view returns (uint256) {}
 
     function _beforeTokenTransfer(
         address from,
         address,
         uint256 amount
     ) internal override {
+        uint256 index = _mintIndex[from];
+        uint256 timeStampMinted = _mintTimestamps[from][index];
+        uint256 amountMinted = _mintAmounts[from][index];
 
         // update amount available to trade based on time since mint
-        getAvailableToTrade(from);
+        if (block.timestamp - timeStampMinted > 24 weeks) {
+            _availableToTrade[from] += amountMinted;
+        }
 
         // require that amount is less than or equal to tokens available for trade
         require(amount <= _availbleToTrade[from], "Tokens locked up");
         
         // update amount availble to trade based on tokens spent
-        _availbleToTrade[from] -= amount;
+        _availableToTrade[from] -= amount;
     }
 
     
