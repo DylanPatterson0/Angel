@@ -19,8 +19,6 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
 
     mapping(address => uint256) internal _availableToTrade;
 
-    event Minted(address account, uint256 amount, address token);
-
     constructor(
         string memory _name,
         string memory _symbol,
@@ -63,10 +61,8 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
 
         // require that amount is less than or equal to tokens available for trade
         require(amount <= _availableToTrade[from], "Tokens locked up");
-        
+
         // update amount availble to trade based on tokens spent
         _availableToTrade[from] -= amount;
     }
-
-    
 }

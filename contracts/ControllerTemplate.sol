@@ -7,15 +7,19 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./TokenTemplate.sol";
 
 interface IControllerTemplate {
-    event Invested(address account, uint256 amount, address token);
-    event Sold(uint256 amount, address token, address buyer, address seller);
+    event Invested(uint256 _amount, address _investor, address _company);
+    event Sold(
+        uint256 amount,
+        address _company,
+        address _buyer,
+        address _seller
+    );
 
     function setTokenContract(address tokenContract) external;
 
-    function invest(address account, uint256 amount) external;
+    function invest(uint256 _amount, address _company) external;
 
-    function sellTokens(address buyer, address seller, uint256 amount) external;
-
+    function sellTokens(uint256 _amount, address _company) external;
 }
 
 contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
@@ -24,7 +28,7 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
 
     address[] internal _approvalForSetTokenContract;
 
-    constructor (address _owner) {}
+    constructor(address _owner) {}
 
     // add approval modifier for setTokenContract
 

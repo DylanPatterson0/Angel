@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./ControllerTemplate.sol";
 import "./TokenTemplate.sol";
 
-
 interface IContractFactory {
     event TokenDeployed();
     event ControllerDeployed();
