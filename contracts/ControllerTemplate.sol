@@ -18,7 +18,7 @@ interface IControllerTemplate {
 
 }
 
-contract ControllerTemplate is IControllerTemplate {
+contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
 
     TokenTemplate internal _tokenContract;
 
@@ -32,13 +32,13 @@ contract ControllerTemplate is IControllerTemplate {
         _tokenContract = TokenTemplate(tokenContract);
     }
 
-    function invest(address account, uint256 amount) external override {
+    function invest(address account, uint256 amount) external override whenNotPaused{
         // call transfer or transferFrom 
         _tokenContract.mint(account, amount);
         emit Invested(account, amount, address(_tokenContract));
     }
 
-    function sellTokens(address buyer, address seller, uint256 amount) external {
+    function sellTokens(address buyer, address seller, uint256 amount) external whenNotPaused{
         _tokenContract.transferFrom(seller, buyer, amount);
 
         emit Sold(amount, address(_tokenContract), buyer, seller);
