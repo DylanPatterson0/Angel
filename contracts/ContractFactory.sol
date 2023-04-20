@@ -42,7 +42,7 @@ contract ContractFactory is IContractFactory, Ownable, Pausable {
         _controllerList.push(_controller);
     }
 
-    function launchTokenControllerPair(address operator, string calldata name, string calldata symbol, uint256 maxSupply) public onlyOwner{
+    function launchTokenControllerPair(address operator, string calldata name, string calldata symbol, uint256 maxSupply) public override onlyOwner{
         createController(operator);
         createToken(name, symbol, maxSupply);
 

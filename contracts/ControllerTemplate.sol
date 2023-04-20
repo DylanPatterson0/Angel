@@ -7,19 +7,19 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./TokenTemplate.sol";
 
 interface IControllerTemplate {
-    event Invested(uint256 _amount, address _investor, address _company);
+    event Invested(address investor, uint256 amount, address company);
     event Sold(
         uint256 amount,
-        address _company,
-        address _buyer,
-        address _seller
+        address company,
+        address buyer,
+        address seller
     );
 
     function setTokenContract(address tokenContract) external;
 
-    function invest(uint256 _amount, address _company) external;
+    function invest(address account, uint256 amount) external;
 
-    function sellTokens(uint256 _amount, address _company) external;
+    function sellTokens(address buyer, address seller, uint256 amount) external;
 }
 
 contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
@@ -42,7 +42,7 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
         emit Invested(account, amount, address(_tokenContract));
     }
 
-    function sellTokens(address buyer, address seller, uint256 amount) external whenNotPaused{
+    function sellTokens(address buyer, address seller, uint256 amount) external override whenNotPaused{
         _tokenContract.transferFrom(seller, buyer, amount);
 
         emit Sold(amount, address(_tokenContract), buyer, seller);

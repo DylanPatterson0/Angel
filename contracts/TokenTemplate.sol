@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./ControllerTemplate.sol";
 
 contract TokenTemplate is ERC20, Ownable, Pausable {
+    
     ControllerTemplate internal _controller;
 
     // account -> amount minted -> timestamp of minting
@@ -18,6 +19,8 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
     mapping(address => uint256) internal _mintIndex;
 
     mapping(address => uint256) internal _availableToTrade;
+
+    event Minted(address account, uint256 amount, address token);
 
     constructor(
         string memory _name,
