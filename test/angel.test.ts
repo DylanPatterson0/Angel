@@ -14,6 +14,7 @@ import {
     ControllerTemplate,
     TokenTemplate
 } from '../typechain-types'
+// eslint-disable-next-line no-duplicate-imports
 import {ethers} from 'hardhat'
 
 chai.use(solidity)
@@ -88,17 +89,26 @@ describe('Angel:', () => {
                     10000
                 )
             tokenContract = <TokenTemplate>(
-                (await ethers.getContractFactory('TokenTemplate')).attach(
-                    returnValue[0]
-                )
+                (
+                    await ethers.getContractFactory(
+                        'contracts/TokenTemplate.sol:TokenTemplate'
+                    )
+                ).attach(returnValue[0])
             )
             controllerContract = <ControllerTemplate>(
-                (await ethers.getContractFactory('ControllerTemplate')).attach(
-                    returnValue[1]
-                )
+                (
+                    await ethers.getContractFactory(
+                        'contracts/ControllerTemplate.sol:ControllerTemplate'
+                    )
+                ).attach(returnValue[1])
             )
             // do random number for amount
-            const tx = await tokenContract.connect(s2).mint(s2.address, 100)
+            const tx = await controllerContract
+                .connect(s2)
+                .invest(s2.address, 100)
+            await expect(tx)
+                .to.emit(controllerContract, 'Invested')
+                .withArgs(s2.address, 100, tokenContract.address)
             await expect(tx)
                 .to.emit(tokenContract, 'Minted')
                 .withArgs(s2.address, 100, tokenContract.address)
