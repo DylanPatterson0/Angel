@@ -68,4 +68,6 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
         // update amount availble to trade based on tokens spent
         _availableToTrade[from] -= amount;
     }
+
+
 }

@@ -8,10 +8,11 @@ import "./ControllerTemplate.sol";
 import "./TokenTemplate.sol";
 
 interface IContractFactory {
-    event TokenDeployed();
-    event ControllerDeployed();
+    event TokenDeployed(address operator, string name, string symbol, uint256 maxSupply);
+    event ControllerDeployed(address operator);
 
-    function launchTokenControllerPair(address operator, string calldata name, string calldata symbol, uint256 maxSupply) external;
+    function launchTokenControllerPair(address operator, string calldata name, string calldata symbol, uint256 maxSupply) external returns (TokenTemplate, ControllerTemplate);
+
 }
 
 contract ContractFactory is IContractFactory, Ownable, Pausable {
@@ -28,11 +29,12 @@ contract ContractFactory is IContractFactory, Ownable, Pausable {
     mapping(ControllerTemplate => TokenTemplate) private _controllerToTokenTracker; 
     
 
-    function createToken(string memory _name, string memory _symbol, uint256 _maxSupply) public {
-        _token = new TokenTemplate(_name, _symbol, _maxSupply);
+    function createToken(address operator, string memory name, string memory symbol, uint256 maxSupply) public {
+        _token = new TokenTemplate(name, symbol, maxSupply);
 
         _tokenList.push(_token);
 
+        emit TokenDeployed(operator, name, symbol, maxSupply);
 
     }
 
@@ -40,14 +42,18 @@ contract ContractFactory is IContractFactory, Ownable, Pausable {
         _controller = new ControllerTemplate(operator);
 
         _controllerList.push(_controller);
+
+        emit ControllerDeployed(operator);
     }
 
-    function launchTokenControllerPair(address operator, string calldata name, string calldata symbol, uint256 maxSupply) public override onlyOwner{
+    function launchTokenControllerPair(address operator, string calldata name, string calldata symbol, uint256 maxSupply) public override onlyOwner returns (TokenTemplate, ControllerTemplate) {
         createController(operator);
-        createToken(name, symbol, maxSupply);
+        createToken(operator, name, symbol, maxSupply);
 
         _controller.setTokenContract(address(_token));
         _token.setControllerContract(address(_controller));
+
+        return (_token, _controller);
 
     }
 
