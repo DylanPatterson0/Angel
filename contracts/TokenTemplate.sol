@@ -42,6 +42,8 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
         require(totalSupply() <= _maxSupply, "Max Supply Reached");
         _mints[account].push(amount);
 
+        _mintIndex[account]++;
+
         _mintTimestamps[account].push(block.timestamp);
         
         _mintAmounts[account].push(amount);
