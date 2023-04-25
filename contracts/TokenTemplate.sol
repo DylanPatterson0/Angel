@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./ControllerTemplate.sol";
 
 contract TokenTemplate is ERC20, Ownable, Pausable {
-    
+    uint256 private _maxSupply;
     ControllerTemplate internal _controller;
 
     // account -> amount minted -> timestamp of minting
@@ -23,10 +23,12 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
     event Minted(address account, uint256 amount, address token);
 
     constructor(
-        string memory _name,
-        string memory _symbol,
-        uint256 _maxSupply
-    ) ERC20(_name, _symbol) {}
+        string memory name,
+        string memory symbol,
+        uint256 maxSupply
+    ) ERC20(name, symbol) {
+        _maxSupply = maxSupply;
+    }
 
     function setControllerContract(address _controllerAddress) external onlyOwner whenNotPaused {
         _controller = ControllerTemplate(_controllerAddress);
@@ -37,6 +39,7 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
     }
 
     function mint(address account, uint256 amount) public payable whenNotPaused{
+        require(totalSupply() <= _maxSupply, "Max Supply Reached");
         _mintingTimestamps[account][block.timestamp] = amount;
         _mints[account].push(amount);
         _mint(account, amount);

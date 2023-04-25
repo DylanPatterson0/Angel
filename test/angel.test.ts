@@ -4,6 +4,7 @@ import '@nomiclabs/hardhat-ethers'
 // End - Support direct Mocha run & debug
 
 import chai, {expect} from 'chai'
+import hre from 'hardhat'
 import {before} from 'mocha'
 import {solidity} from 'ethereum-waffle'
 import {deployContract, signer} from './framework/contracts'
@@ -88,21 +89,28 @@ describe('Angel:', () => {
                     'SYM',
                     10000
                 )
+
+            await contractFactory
+                .connect(s0)
+                .launchTokenControllerPair(s1.address, 'token', 'SYM', 10000)
+
+            const TContract = await ethers.getContractFactory(
+                'contracts/TokenTemplate.sol:TokenTemplate'
+            )
+            const tContract = TContract.attach(returnValue[0])
+
             tokenContract = <TokenTemplate>(
-                (
-                    await ethers.getContractFactory(
-                        'contracts/TokenTemplate.sol:TokenTemplate'
-                    )
-                ).attach(returnValue[0])
+                await hre.ethers.getContractAt('TokenTemplate', returnValue[0])
             )
             controllerContract = <ControllerTemplate>(
-                (
-                    await ethers.getContractFactory(
-                        'contracts/ControllerTemplate.sol:ControllerTemplate'
-                    )
-                ).attach(returnValue[1])
+                await hre.ethers.getContractAt(
+                    'ControllerTemplate',
+                    returnValue[1]
+                )
             )
-            // do random number for amount
+
+            console.log(await tokenContract.connect(s1).getControllerContract())
+
             const tx = await controllerContract
                 .connect(s2)
                 .invest(s2.address, 100)
