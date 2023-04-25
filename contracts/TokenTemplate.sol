@@ -40,7 +40,6 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
 
     function mint(address account, uint256 amount) public payable whenNotPaused{
         require(totalSupply() <= _maxSupply, "Max Supply Reached");
-        _mintingTimestamps[account][block.timestamp] = amount;
         _mints[account].push(amount);
 
         _mintTimestamps[account].push(block.timestamp);
