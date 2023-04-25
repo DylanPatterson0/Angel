@@ -42,6 +42,11 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
         require(totalSupply() <= _maxSupply, "Max Supply Reached");
         _mintingTimestamps[account][block.timestamp] = amount;
         _mints[account].push(amount);
+
+        _mintTimestamps[account].push(block.timestamp);
+        
+        _mintAmounts[account].push(amount);
+
         _mint(account, amount);
 
         emit Minted(account, amount, address(this));
@@ -57,12 +62,15 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
         uint256 amount
     ) internal override {
         uint256 index = _mintIndex[from];
+
         uint256 timeStampMinted = _mintTimestamps[from][index];
+        
         uint256 amountMinted = _mintAmounts[from][index];
 
         // update amount available to trade based on time since mint
         if (block.timestamp - timeStampMinted > 24 weeks) {
             _availableToTrade[from] += amountMinted;
+            _mintIndex[from]++;
         }
 
         // require that amount is less than or equal to tokens available for trade
