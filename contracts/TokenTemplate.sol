@@ -23,10 +23,16 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
 
     event Minted(address account, uint256 amount, address token);
 
+    modifier onlyController() {
+        require(msg.sender == address(_controller), "Non-controller call");
+        _;
+    }
+
     constructor(
         string memory name,
         string memory symbol,
-        uint256 maxSupply
+        uint256 maxSupply,
+        uint256 maxCap
     ) ERC20(name, symbol) {
         _maxSupply = maxSupply;
     }
@@ -37,6 +43,10 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
         _controller = ControllerTemplate(_controllerAddress);
     }
 
+    function burn(address account, uint256 amount) external onlyController {
+        _burn(account, amount);
+    }
+
     function getControllerContract() external view returns (address) {
         return address(_controller);
     }
@@ -44,7 +54,7 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
     function mint(
         address account,
         uint256 amount
-    ) public payable whenNotPaused {
+    ) public payable whenNotPaused onlyController {
         require(totalSupply() <= _maxSupply, "Max Supply Reached");
         _mints[account].push(amount);
 
@@ -59,10 +69,6 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
         emit Minted(account, amount, address(this));
     }
 
-    function getAvailableToTrade(
-        address account
-    ) public view returns (uint256) {}
-
     function _beforeTokenTransfer(
         address account,
         address to,
@@ -70,7 +76,7 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
     ) internal override {
         // address(0) is from address in mint
         // refer to ERC20.sol:262
-        if (account == address(0)) {} else {
+        if (account == address(0)) {} else if (to == address(0)) {} else {
             uint256 index = _mintIndex[account];
             uint256 timeStampMinted = _mintTimestamps[account][index - 1];
             uint256 amountMinted = _mintAmounts[account][index - 1];
