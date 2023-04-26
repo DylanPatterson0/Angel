@@ -14,17 +14,13 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
     uint256 private _marketCap;
     uint256 private _tokenMintPrice;
     ControllerTemplate internal _controller;
-
     // account -> amount minted -> timestamp of minting
     mapping(address => mapping(uint256 => uint256)) internal _mintingTimestamps;
     mapping(address => uint256[]) internal _mints;
-
     mapping(address => uint256[]) internal _mintTimestamps;
     mapping(address => uint256[]) internal _mintAmounts;
     mapping(address => uint256) internal _mintIndex;
-
     mapping(address => uint256) internal _availableToTrade;
-
     event Minted(address account, uint256 amount, address token);
 
     modifier onlyController() {
@@ -62,18 +58,12 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
         uint256 amount
     ) public payable whenNotPaused onlyController {
         require(totalSupply() <= _maxSupply, "Max Supply Reached");
-
         //require(_tokenMintPrice = msg.value, "")
         _mints[account].push(amount);
-
         _mintTimestamps[account].push(block.timestamp);
-
         _mintAmounts[account].push(amount);
-
         _mint(account, amount);
-
         _mintIndex[account]++;
-
         emit Minted(account, amount, address(this));
     }
 
