@@ -139,7 +139,10 @@ describe('Angel:', () => {
             )
             await controllerContract.connect(s2).invest(s2.address, 100)
 
-            // make random number for amount
+            /*
+             *  make random number for amount
+             * approve controller contract to spennd your money
+             */
             await tokenContract
                 .connect(s2)
                 .approve(controllerContract.address, 20)
