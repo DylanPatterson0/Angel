@@ -15,6 +15,8 @@ interface IControllerTemplate {
     function invest(address account, uint256 amount) external;
 
     function sellTokens(address buyer, address seller, uint256 amount) external;
+
+    function withdraw(address operator, uint256 amount) external;
 }
 
 contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
@@ -47,5 +49,13 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
         _tokenContract.transferFrom(seller, buyer, amount);
 
         emit Sold(amount, address(_tokenContract), buyer, seller);
+    }
+
+    function withdraw(address operator, uint256 amount) external override {
+        require(
+            _tokenContract.balanceOf(operator) >= amount,
+            "Insufficient Funds"
+        );
+        // _tokenContract._burn(operator, amount);
     }
 }
