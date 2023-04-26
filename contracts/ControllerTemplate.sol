@@ -21,13 +21,11 @@ interface IControllerTemplate {
 
 contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
     TokenTemplate internal _tokenContract;
-
     address[] internal _approvalForSetTokenContract;
 
     constructor(address _owner) {}
 
     // add approval modifier for setTokenContract
-
     function setTokenContract(address tokenContract) external override {
         _tokenContract = TokenTemplate(tokenContract);
     }
@@ -47,7 +45,6 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
         uint256 amount
     ) external override whenNotPaused {
         _tokenContract.transferFrom(seller, buyer, amount);
-
         emit Sold(amount, address(_tokenContract), buyer, seller);
     }
 
@@ -56,7 +53,6 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
             _tokenContract.balanceOf(operator) >= amount,
             "Insufficient Funds"
         );
-
         _tokenContract.burn(operator, amount);
     }
 }

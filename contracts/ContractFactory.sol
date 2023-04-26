@@ -28,13 +28,9 @@ interface IContractFactory {
 
 contract ContractFactory is IContractFactory, Ownable, Pausable {
     TokenTemplate private _token;
-
     ControllerTemplate private _controller;
-
     TokenTemplate[] private _tokenList;
-
     ControllerTemplate[] private _controllerList;
-
     // update this whenever setTokenContract is called
     mapping(ControllerTemplate => TokenTemplate)
         private _controllerToTokenTracker;
@@ -47,17 +43,13 @@ contract ContractFactory is IContractFactory, Ownable, Pausable {
         uint256 marketCap
     ) public {
         _token = new TokenTemplate(name, symbol, maxSupply, marketCap);
-
         _tokenList.push(_token);
-
         emit TokenDeployed(operator, name, symbol, maxSupply, marketCap);
     }
 
     function createController(address operator) public onlyOwner {
         _controller = new ControllerTemplate(operator);
-
         _controllerList.push(_controller);
-
         emit ControllerDeployed(operator);
     }
 
@@ -70,10 +62,8 @@ contract ContractFactory is IContractFactory, Ownable, Pausable {
     ) public override onlyOwner returns (TokenTemplate, ControllerTemplate) {
         createController(operator);
         createToken(operator, name, symbol, maxSupply, marketCap);
-
         _controller.setTokenContract(address(_token));
         _token.setControllerContract(address(_controller));
-
         return (_token, _controller);
     }
 }
