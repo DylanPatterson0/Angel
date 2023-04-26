@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./ControllerTemplate.sol";
+import "hardhat/console.sol";
 
 contract TokenTemplate is ERC20, Ownable, Pausable {
     uint256 private _maxSupply;
@@ -42,13 +43,13 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
         require(totalSupply() <= _maxSupply, "Max Supply Reached");
         _mints[account].push(amount);
 
-        _mintIndex[account]++;
-
         _mintTimestamps[account].push(block.timestamp);
         
         _mintAmounts[account].push(amount);
 
         _mint(account, amount);
+
+         _mintIndex[account]++;
 
         emit Minted(account, amount, address(this));
     }
@@ -59,26 +60,33 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
 
     function _beforeTokenTransfer(
         address from,
-        address,
+        address account,
         uint256 amount
     ) internal override {
-        uint256 index = _mintIndex[from];
 
-        uint256 timeStampMinted = _mintTimestamps[from][index];
-        
-        uint256 amountMinted = _mintAmounts[from][index];
+        // address(0) is from address in mint
+        // refer to ERC20.sol:262 
+        if (from == address(0)) {}
+
+        else {
+        uint256 index = _mintIndex[account];
+
+        uint256 timeStampMinted = _mintTimestamps[account][index];
+
+        uint256 amountMinted = _mintAmounts[account][index];
 
         // update amount available to trade based on time since mint
         if (block.timestamp - timeStampMinted > 24 weeks) {
-            _availableToTrade[from] += amountMinted;
-            _mintIndex[from]++;
+            _availableToTrade[account] += amountMinted;
+            _mintIndex[account]++;
         }
 
         // require that amount is less than or equal to tokens available for trade
-        require(amount <= _availableToTrade[from], "Tokens locked up");
+        require(amount <= _availableToTrade[account], "Tokens locked up");
 
         // update amount availble to trade based on tokens spent
-        _availableToTrade[from] -= amount;
+        _availableToTrade[account] -= amount;
+        }
     }
     
 

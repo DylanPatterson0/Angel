@@ -94,11 +94,6 @@ describe('Angel:', () => {
                 .connect(s0)
                 .launchTokenControllerPair(s1.address, 'token', 'SYM', 10000)
 
-            const TContract = await ethers.getContractFactory(
-                'contracts/TokenTemplate.sol:TokenTemplate'
-            )
-            const tContract = TContract.attach(returnValue[0])
-
             tokenContract = <TokenTemplate>(
                 await hre.ethers.getContractAt('TokenTemplate', returnValue[0])
             )
@@ -109,17 +104,50 @@ describe('Angel:', () => {
                 )
             )
 
-            console.log(await tokenContract.connect(s1).getControllerContract())
-
             const tx = await controllerContract
                 .connect(s2)
                 .invest(s2.address, 100)
             await expect(tx)
-                .to.emit(controllerContract, 'Invested')
-                .withArgs(s2.address, 100, tokenContract.address)
-            await expect(tx)
                 .to.emit(tokenContract, 'Minted')
                 .withArgs(s2.address, 100, tokenContract.address)
+            await expect(tx)
+                .to.emit(controllerContract, 'Invested')
+                .withArgs(s2.address, 100, tokenContract.address)
+
+            // need to check timestamp / lockup period funcitonality
+        })
+        it('Should revert if sale before lockup period', async () => {
+            const returnValue = await contractFactory
+                .connect(s0)
+                .callStatic.launchTokenControllerPair(
+                    s1.address,
+                    'token',
+                    'SYM',
+                    10000
+                )
+            await contractFactory
+                .connect(s0)
+                .launchTokenControllerPair(s1.address, 'token', 'SYM', 10000)
+            tokenContract = <TokenTemplate>(
+                await hre.ethers.getContractAt('TokenTemplate', returnValue[0])
+            )
+            controllerContract = <ControllerTemplate>(
+                await hre.ethers.getContractAt(
+                    'ControllerTemplate',
+                    returnValue[1]
+                )
+            )
+            await controllerContract.connect(s2).invest(s2.address, 100)
+
+            // make random number for amount
+            await tokenContract
+                .connect(s2)
+                .approve(controllerContract.address, 20)
+            await expect(
+                controllerContract
+                    .connect(s2)
+                    .sellTokens(s0.address, s2.address, 10)
+            ).to.be.revertedWith('Tokens locked up')
         })
     })
 })

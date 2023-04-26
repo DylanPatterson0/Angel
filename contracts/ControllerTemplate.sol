@@ -43,7 +43,9 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
     }
 
     function sellTokens(address buyer, address seller, uint256 amount) external override whenNotPaused{
+        
         _tokenContract.transferFrom(seller, buyer, amount);
+
 
         emit Sold(amount, address(_tokenContract), buyer, seller);
     }
