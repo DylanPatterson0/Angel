@@ -8,15 +8,23 @@ import "./ControllerTemplate.sol";
 import "./TokenTemplate.sol";
 
 interface IContractFactory {
-    event TokenDeployed(address operator, string name, string symbol, uint256 maxSupply);
+    event TokenDeployed(
+        address operator,
+        string name,
+        string symbol,
+        uint256 maxSupply
+    );
     event ControllerDeployed(address operator);
 
-    function launchTokenControllerPair(address operator, string calldata name, string calldata symbol, uint256 maxSupply) external returns (TokenTemplate, ControllerTemplate);
-
+    function launchTokenControllerPair(
+        address operator,
+        string calldata name,
+        string calldata symbol,
+        uint256 maxSupply
+    ) external returns (TokenTemplate, ControllerTemplate);
 }
 
 contract ContractFactory is IContractFactory, Ownable, Pausable {
-
     TokenTemplate private _token;
 
     ControllerTemplate private _controller;
@@ -26,19 +34,23 @@ contract ContractFactory is IContractFactory, Ownable, Pausable {
     ControllerTemplate[] private _controllerList;
 
     // update this whenever setTokenContract is called
-    mapping(ControllerTemplate => TokenTemplate) private _controllerToTokenTracker; 
-    
+    mapping(ControllerTemplate => TokenTemplate)
+        private _controllerToTokenTracker;
 
-    function createToken(address operator, string memory name, string memory symbol, uint256 maxSupply) public {
+    function createToken(
+        address operator,
+        string memory name,
+        string memory symbol,
+        uint256 maxSupply
+    ) public {
         _token = new TokenTemplate(name, symbol, maxSupply);
 
         _tokenList.push(_token);
 
         emit TokenDeployed(operator, name, symbol, maxSupply);
-
     }
 
-    function createController(address operator) public onlyOwner{
+    function createController(address operator) public onlyOwner {
         _controller = new ControllerTemplate(operator);
 
         _controllerList.push(_controller);
@@ -46,7 +58,12 @@ contract ContractFactory is IContractFactory, Ownable, Pausable {
         emit ControllerDeployed(operator);
     }
 
-    function launchTokenControllerPair(address operator, string calldata name, string calldata symbol, uint256 maxSupply) public override onlyOwner returns (TokenTemplate, ControllerTemplate) {
+    function launchTokenControllerPair(
+        address operator,
+        string calldata name,
+        string calldata symbol,
+        uint256 maxSupply
+    ) public override onlyOwner returns (TokenTemplate, ControllerTemplate) {
         createController(operator);
         createToken(operator, name, symbol, maxSupply);
 
@@ -54,7 +71,5 @@ contract ContractFactory is IContractFactory, Ownable, Pausable {
         _token.setControllerContract(address(_controller));
 
         return (_token, _controller);
-
     }
-
 }
