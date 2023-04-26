@@ -70,10 +70,13 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
 
         else {
         uint256 index = _mintIndex[account];
+        console.log(index);
 
         uint256 timeStampMinted = _mintTimestamps[account][index];
+        console.log(timeStampMinted);
 
         uint256 amountMinted = _mintAmounts[account][index];
+        console.log(amountMinted);
 
         // update amount available to trade based on time since mint
         if (block.timestamp - timeStampMinted > 24 weeks) {
