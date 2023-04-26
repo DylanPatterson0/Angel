@@ -152,5 +152,48 @@ describe('Angel:', () => {
                     .sellTokens(s0.address, s2.address, 10)
             ).to.be.revertedWith('Tokens locked up')
         })
+        it('Should allow sale if been over a year', async () => {
+            const returnValue = await contractFactory
+                .connect(s0)
+                .callStatic.launchTokenControllerPair(
+                    s1.address,
+                    'token',
+                    'SYM',
+                    10000
+                )
+            await contractFactory
+                .connect(s0)
+                .launchTokenControllerPair(s1.address, 'token', 'SYM', 10000)
+            tokenContract = <TokenTemplate>(
+                await hre.ethers.getContractAt('TokenTemplate', returnValue[0])
+            )
+            controllerContract = <ControllerTemplate>(
+                await hre.ethers.getContractAt(
+                    'ControllerTemplate',
+                    returnValue[1]
+                )
+            )
+            await controllerContract.connect(s2).invest(s2.address, 100)
+
+            /*
+             *  make random number for amount
+             * approve controller contract to spennd your money
+             */
+            await tokenContract
+                .connect(s2)
+                .approve(controllerContract.address, 20)
+
+            // increase time by 1 year
+            await ethers.provider.send('evm_increaseTime', [31536000]) // 31536000 seconds = 1 year
+            await ethers.provider.send('evm_mine', [])
+
+            await controllerContract
+                .connect(s2)
+                .sellTokens(s0.address, s2.address, 10)
+
+            expect(
+                await tokenContract.connect(s0).balanceOf(s0.address)
+            ).to.equal(10)
+        })
     })
 })
