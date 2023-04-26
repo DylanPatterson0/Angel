@@ -54,7 +54,7 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
     function withdraw(address operator, uint256 amount) external override {
         require(
             _tokenContract.balanceOf(operator) >= amount,
-            "Insufficient Funds"
+            "Insufficient Fundz"
         );
         // _tokenContract._burn(operator, amount);
     }
