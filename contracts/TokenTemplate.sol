@@ -59,23 +59,23 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
     ) public view returns (uint256) {}
 
     function _beforeTokenTransfer(
-        address from,
         address account,
+        address to,
         uint256 amount
     ) internal override {
 
         // address(0) is from address in mint
         // refer to ERC20.sol:262 
-        if (from == address(0)) {}
+        if (account == address(0)) {}
 
         else {
         uint256 index = _mintIndex[account];
         console.log(index);
 
-        uint256 timeStampMinted = _mintTimestamps[account][index];
-        console.log(timeStampMinted);
+        uint256 timeStampMinted = _mintTimestamps[account][index-1];
+        
 
-        uint256 amountMinted = _mintAmounts[account][index];
+        uint256 amountMinted = _mintAmounts[account][index-1];
         console.log(amountMinted);
 
         // update amount available to trade based on time since mint
