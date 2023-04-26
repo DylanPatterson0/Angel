@@ -31,7 +31,9 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
         _maxSupply = maxSupply;
     }
 
-    function setControllerContract(address _controllerAddress) external onlyOwner whenNotPaused {
+    function setControllerContract(
+        address _controllerAddress
+    ) external onlyOwner whenNotPaused {
         _controller = ControllerTemplate(_controllerAddress);
     }
 
@@ -39,17 +41,20 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
         return address(_controller);
     }
 
-    function mint(address account, uint256 amount) public payable whenNotPaused{
+    function mint(
+        address account,
+        uint256 amount
+    ) public payable whenNotPaused {
         require(totalSupply() <= _maxSupply, "Max Supply Reached");
         _mints[account].push(amount);
 
         _mintTimestamps[account].push(block.timestamp);
-        
+
         _mintAmounts[account].push(amount);
 
         _mint(account, amount);
 
-         _mintIndex[account]++;
+        _mintIndex[account]++;
 
         emit Minted(account, amount, address(this));
     }
@@ -63,34 +68,21 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
         address to,
         uint256 amount
     ) internal override {
-
         // address(0) is from address in mint
-        // refer to ERC20.sol:262 
-        if (account == address(0)) {}
-
-        else {
-        uint256 index = _mintIndex[account];
-        console.log(index);
-
-        uint256 timeStampMinted = _mintTimestamps[account][index-1];
-        
-
-        uint256 amountMinted = _mintAmounts[account][index-1];
-        console.log(amountMinted);
-
-        // update amount available to trade based on time since mint
-        if (block.timestamp - timeStampMinted > 24 weeks) {
-            _availableToTrade[account] += amountMinted;
-            _mintIndex[account]++;
-        }
-
-        // require that amount is less than or equal to tokens available for trade
-        require(amount <= _availableToTrade[account], "Tokens locked up");
-
-        // update amount availble to trade based on tokens spent
-        _availableToTrade[account] -= amount;
+        // refer to ERC20.sol:262
+        if (account == address(0)) {} else {
+            uint256 index = _mintIndex[account];
+            uint256 timeStampMinted = _mintTimestamps[account][index - 1];
+            uint256 amountMinted = _mintAmounts[account][index - 1];
+            // update amount available to trade based on time since mint
+            if (block.timestamp - timeStampMinted > 24 weeks) {
+                _availableToTrade[account] += amountMinted;
+                _mintIndex[account]++;
+            }
+            // require that amount is less than or equal to tokens available for trade
+            require(amount <= _availableToTrade[account], "Tokens locked up");
+            // update amount availble to trade based on tokens spent
+            _availableToTrade[account] -= amount;
         }
     }
-    
-
 }
