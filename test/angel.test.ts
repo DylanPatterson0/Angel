@@ -58,21 +58,27 @@ describe('Angel:', () => {
         it('Contract Factory: deploy token contract and check for event emission', async () => {
             const tx = await contractFactory
                 .connect(s0)
-                .createToken(s1.address, 'token', 'SYM', 10000)
+                .createToken(s1.address, 'token', 'SYM', 10000, 1000000)
             await expect(tx)
                 .to.emit(contractFactory, 'TokenDeployed')
-                .withArgs(s1.address, 'token', 'SYM', 10000)
+                .withArgs(s1.address, 'token', 'SYM', 10000, 1000000)
         })
         it('Contract Factory: launchTokenControllerPair', async () => {
             const tx = await contractFactory
                 .connect(s0)
-                .launchTokenControllerPair(s1.address, 'token', 'SYM', 10000)
+                .launchTokenControllerPair(
+                    s1.address,
+                    'token',
+                    'SYM',
+                    10000,
+                    1000000
+                )
             await expect(tx)
                 .to.emit(contractFactory, 'ControllerDeployed')
                 .withArgs(s1.address)
             await expect(tx)
                 .to.emit(contractFactory, 'TokenDeployed')
-                .withArgs(s1.address, 'token', 'SYM', 10000)
+                .withArgs(s1.address, 'token', 'SYM', 10000, 1000000)
         })
     })
     describe('Function tests', () => {
@@ -87,12 +93,19 @@ describe('Angel:', () => {
                     s1.address,
                     'token',
                     'SYM',
-                    10000
+                    10000,
+                    1000000
                 )
 
             await contractFactory
                 .connect(s0)
-                .launchTokenControllerPair(s1.address, 'token', 'SYM', 10000)
+                .launchTokenControllerPair(
+                    s1.address,
+                    'token',
+                    'SYM',
+                    10000,
+                    1000000
+                )
 
             tokenContract = <TokenTemplate>(
                 await hre.ethers.getContractAt('TokenTemplate', returnValue[0])
@@ -123,11 +136,18 @@ describe('Angel:', () => {
                     s1.address,
                     'token',
                     'SYM',
-                    10000
+                    10000,
+                    1000000
                 )
             await contractFactory
                 .connect(s0)
-                .launchTokenControllerPair(s1.address, 'token', 'SYM', 10000)
+                .launchTokenControllerPair(
+                    s1.address,
+                    'token',
+                    'SYM',
+                    10000,
+                    1000000
+                )
             tokenContract = <TokenTemplate>(
                 await hre.ethers.getContractAt('TokenTemplate', returnValue[0])
             )
@@ -159,11 +179,18 @@ describe('Angel:', () => {
                     s1.address,
                     'token',
                     'SYM',
-                    10000
+                    10000,
+                    1000000
                 )
             await contractFactory
                 .connect(s0)
-                .launchTokenControllerPair(s1.address, 'token', 'SYM', 10000)
+                .launchTokenControllerPair(
+                    s1.address,
+                    'token',
+                    'SYM',
+                    10000,
+                    1000000
+                )
             tokenContract = <TokenTemplate>(
                 await hre.ethers.getContractAt('TokenTemplate', returnValue[0])
             )
@@ -194,6 +221,41 @@ describe('Angel:', () => {
             expect(
                 await tokenContract.connect(s0).balanceOf(s0.address)
             ).to.equal(10)
+        })
+        it('Should allow company to withdraw funds', async () => {
+            const returnValue = await contractFactory
+                .connect(s0)
+                .callStatic.launchTokenControllerPair(
+                    s1.address,
+                    'token',
+                    'SYM',
+                    10000,
+                    1000000
+                )
+            await contractFactory
+                .connect(s0)
+                .launchTokenControllerPair(
+                    s1.address,
+                    'token',
+                    'SYM',
+                    10000,
+                    1000000
+                )
+            tokenContract = <TokenTemplate>(
+                await hre.ethers.getContractAt('TokenTemplate', returnValue[0])
+            )
+            controllerContract = <ControllerTemplate>(
+                await hre.ethers.getContractAt(
+                    'ControllerTemplate',
+                    returnValue[1]
+                )
+            )
+            await controllerContract.connect(s0).invest(s2.address, 100)
+            await controllerContract.connect(s0).withdraw(s2.address, 85)
+
+            expect(
+                await tokenContract.connect(s2).balanceOf(s2.address)
+            ).to.equal(15)
         })
     })
 })

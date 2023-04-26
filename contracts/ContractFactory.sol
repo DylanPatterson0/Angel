@@ -12,7 +12,8 @@ interface IContractFactory {
         address operator,
         string name,
         string symbol,
-        uint256 maxSupply
+        uint256 maxSupply,
+        uint256 marketCap
     );
     event ControllerDeployed(address operator);
 
@@ -20,7 +21,8 @@ interface IContractFactory {
         address operator,
         string calldata name,
         string calldata symbol,
-        uint256 maxSupply
+        uint256 maxSupply,
+        uint256 marketCap
     ) external returns (TokenTemplate, ControllerTemplate);
 }
 
@@ -41,13 +43,14 @@ contract ContractFactory is IContractFactory, Ownable, Pausable {
         address operator,
         string memory name,
         string memory symbol,
-        uint256 maxSupply
+        uint256 maxSupply,
+        uint256 marketCap
     ) public {
-        _token = new TokenTemplate(name, symbol, maxSupply);
+        _token = new TokenTemplate(name, symbol, maxSupply, marketCap);
 
         _tokenList.push(_token);
 
-        emit TokenDeployed(operator, name, symbol, maxSupply);
+        emit TokenDeployed(operator, name, symbol, maxSupply, marketCap);
     }
 
     function createController(address operator) public onlyOwner {
@@ -62,10 +65,11 @@ contract ContractFactory is IContractFactory, Ownable, Pausable {
         address operator,
         string calldata name,
         string calldata symbol,
-        uint256 maxSupply
+        uint256 maxSupply,
+        uint256 marketCap
     ) public override onlyOwner returns (TokenTemplate, ControllerTemplate) {
         createController(operator);
-        createToken(operator, name, symbol, maxSupply);
+        createToken(operator, name, symbol, maxSupply, marketCap);
 
         _controller.setTokenContract(address(_token));
         _token.setControllerContract(address(_controller));

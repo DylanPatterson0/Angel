@@ -8,7 +8,11 @@ import "./ControllerTemplate.sol";
 import "hardhat/console.sol";
 
 contract TokenTemplate is ERC20, Ownable, Pausable {
+    //max supply (number of tokens that can be issues)
     uint256 private _maxSupply;
+    //market cap (amount of money company wants to raise)
+    uint256 private _marketCap;
+    uint256 private _tokenMintPrice;
     ControllerTemplate internal _controller;
 
     // account -> amount minted -> timestamp of minting
@@ -32,9 +36,11 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
         string memory name,
         string memory symbol,
         uint256 maxSupply,
-        uint256 maxCap
+        uint256 marketCap
     ) ERC20(name, symbol) {
         _maxSupply = maxSupply;
+        _marketCap = marketCap;
+        _tokenMintPrice = marketCap / maxSupply;
     }
 
     function setControllerContract(
@@ -56,6 +62,8 @@ contract TokenTemplate is ERC20, Ownable, Pausable {
         uint256 amount
     ) public payable whenNotPaused onlyController {
         require(totalSupply() <= _maxSupply, "Max Supply Reached");
+
+        //require(_tokenMintPrice = msg.value, "")
         _mints[account].push(amount);
 
         _mintTimestamps[account].push(block.timestamp);

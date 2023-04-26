@@ -56,6 +56,7 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
             _tokenContract.balanceOf(operator) >= amount,
             "Insufficient Funds"
         );
+
         _tokenContract.burn(operator, amount);
     }
 }
