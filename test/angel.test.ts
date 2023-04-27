@@ -50,7 +50,7 @@ describe('Angel:', () => {
         it('Contract Factory: deploy controller contract and check for event emission', async () => {
             const tx = await contractFactory
                 .connect(s0)
-                .createController(s1.address)
+                .createController(s1.address, 100000, 100000)
             void expect(tx)
                 .to.emit(contractFactory, 'ControllerDeployed')
                 .withArgs(s1.address)

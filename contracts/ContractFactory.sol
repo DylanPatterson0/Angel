@@ -47,8 +47,12 @@ contract ContractFactory is IContractFactory, Ownable, Pausable {
         emit TokenDeployed(operator, name, symbol, maxSupply, marketCap);
     }
 
-    function createController(address operator) public onlyOwner {
-        _controller = new ControllerTemplate(operator);
+    function createController(
+        address operator,
+        uint256 maxSupply,
+        uint256 marketCap
+    ) public onlyOwner {
+        _controller = new ControllerTemplate(operator, maxSupply, marketCap);
         _controllerList.push(_controller);
         emit ControllerDeployed(operator);
     }
@@ -60,7 +64,7 @@ contract ContractFactory is IContractFactory, Ownable, Pausable {
         uint256 maxSupply,
         uint256 marketCap
     ) public override onlyOwner returns (TokenTemplate, ControllerTemplate) {
-        createController(operator);
+        createController(operator, maxSupply, marketCap);
         createToken(operator, name, symbol, maxSupply, marketCap);
         _controller.setTokenContract(address(_token));
         _token.setControllerContract(address(_controller));

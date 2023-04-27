@@ -23,14 +23,20 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
     TokenTemplate internal _tokenContract;
     address[] internal _approvalForSetTokenContract;
     address private _operator;
+    uint256 _maxSupply;
+    uint256 _marketCap;
+    uint256 _tokenMintPrice;
 
     modifier onlyOperator() {
         require(msg.sender == address(_operator), "Non-operator call");
         _;
     }
 
-    constructor(address operator) {
+    constructor(address operator, uint256 maxSupply, uint256 marketCap) {
         _operator = operator;
+        _maxSupply = maxSupply;
+        _marketCap = marketCap;
+        _tokenMintPrice = marketCap / maxSupply;
     }
 
     // add approval modifier for setTokenContract
