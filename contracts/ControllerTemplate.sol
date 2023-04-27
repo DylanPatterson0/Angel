@@ -21,9 +21,9 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
     TokenTemplate internal _tokenContract;
     address[] internal _approvalForSetTokenContract;
     address private _operator;
-    uint256 _maxSupply;
-    uint256 _marketCap;
-    uint256 _tokenMintPrice;
+    uint256 private _maxSupply;
+    uint256 private _marketCap;
+    uint256 private _tokenMintPrice;
 
     modifier onlyOperator() {
         require(msg.sender == address(_operator), "Non-operator call");
@@ -44,18 +44,6 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
         _tokenContract = TokenTemplate(tokenContract);
     }
 
-    function invest(
-        address account,
-        uint256 amount
-    ) public payable whenNotPaused {
-        require(
-            msg.value == _tokenMintPrice * amount,
-            "Incorrect exchange rate"
-        );
-        _tokenContract.mint(account, amount);
-        emit Invested(account, amount, address(_tokenContract));
-    }
-
     function sellTokens(
         address buyer,
         address seller,
@@ -70,5 +58,17 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
         uint256 amount
     ) external override onlyOperator {
         payable(operator).transfer(amount);
+    }
+
+    function invest(
+        address account,
+        uint256 amount
+    ) public payable whenNotPaused {
+        require(
+            msg.value == _tokenMintPrice * amount,
+            "Incorrect exchange rate"
+        );
+        _tokenContract.mint(account, amount);
+        emit Invested(account, amount, address(_tokenContract));
     }
 }
