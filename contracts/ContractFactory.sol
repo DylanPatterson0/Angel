@@ -41,7 +41,7 @@ contract ContractFactory is IContractFactory, Ownable, Pausable {
         string memory symbol,
         uint256 maxSupply,
         uint256 marketCap
-    ) public {
+    ) public onlyOwner {
         _token = new TokenTemplate(name, symbol, maxSupply, marketCap);
         _tokenList.push(_token);
         emit TokenDeployed(operator, name, symbol, maxSupply, marketCap);
