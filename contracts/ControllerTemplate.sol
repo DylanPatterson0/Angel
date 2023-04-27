@@ -22,11 +22,21 @@ interface IControllerTemplate {
 contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
     TokenTemplate internal _tokenContract;
     address[] internal _approvalForSetTokenContract;
+    address private _operator;
 
-    constructor(address _owner) {}
+    modifier onlyOperator() {
+        require(msg.sender == address(_operator), "Non-operator call");
+        _;
+    }
+
+    constructor(address operator) {
+        _operator = operator;
+    }
 
     // add approval modifier for setTokenContract
-    function setTokenContract(address tokenContract) external override {
+    function setTokenContract(
+        address tokenContract
+    ) external override onlyOwner {
         _tokenContract = TokenTemplate(tokenContract);
     }
 
@@ -47,8 +57,10 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
         emit Sold(amount, address(_tokenContract), buyer, seller);
     }
 
-    function withdraw(address operator, uint256 amount) external override {
-        //need require?
+    function withdraw(
+        address operator,
+        uint256 amount
+    ) external override onlyOperator {
         payable(operator).transfer(amount);
     }
 }
