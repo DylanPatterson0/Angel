@@ -250,8 +250,10 @@ describe('Angel:', () => {
                     returnValue[1]
                 )
             )
-            await controllerContract.connect(s0).invest(s2.address, 100)
-            await controllerContract.connect(s0).withdraw(s2.address, 85)
+
+            const initialValue = await controllerContract
+                .connect(s1)
+                .withdraw(s1.address, 85)
 
             expect(
                 await tokenContract.connect(s2).balanceOf(s2.address)
