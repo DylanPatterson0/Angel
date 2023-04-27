@@ -50,6 +50,7 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
         address account,
         uint256 amount
     ) external override whenNotPaused {
+        require(msg.value = _tokenMintPrice * amount, "Wrong amount");
         _tokenContract.mint(account, amount);
         emit Invested(account, amount, address(_tokenContract));
     }
