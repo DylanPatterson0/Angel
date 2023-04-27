@@ -12,8 +12,6 @@ interface IControllerTemplate {
 
     function setTokenContract(address tokenContract) external;
 
-    function invest(address account, uint256 amount) external;
-
     function sellTokens(address buyer, address seller, uint256 amount) external;
 
     function withdraw(address operator, uint256 amount) external;
@@ -49,7 +47,11 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
     function invest(
         address account,
         uint256 amount
-    ) external override whenNotPaused {
+    ) public payable whenNotPaused {
+        require(
+            msg.value == _tokenMintPrice * amount,
+            "Incorrect exchange rate"
+        );
         _tokenContract.mint(account, amount);
         emit Invested(account, amount, address(_tokenContract));
     }
