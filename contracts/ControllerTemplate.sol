@@ -34,7 +34,6 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
         address account,
         uint256 amount
     ) external override whenNotPaused {
-        // call transfer or transferFrom
         _tokenContract.mint(account, amount);
         emit Invested(account, amount, address(_tokenContract));
     }
@@ -49,10 +48,6 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
     }
 
     function withdraw(address operator, uint256 amount) external override {
-        require(
-            _tokenContract.balanceOf(operator) >= amount,
-            "Insufficient Funds"
-        );
-        _tokenContract.burn(operator, amount);
+        payable(operator).transfer(amount);
     }
 }
