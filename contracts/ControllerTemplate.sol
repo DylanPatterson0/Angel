@@ -48,6 +48,7 @@ contract ControllerTemplate is IControllerTemplate, Ownable, Pausable {
     }
 
     function withdraw(address operator, uint256 amount) external override {
+        //need require?
         payable(operator).transfer(amount);
     }
 }
